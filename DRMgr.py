@@ -48,35 +48,6 @@ def debug_dialog(msg, exception=None):
     dlg.Destroy()
 
 
-class DnDFilePickerCtrl(FBB.FileBrowseButton, wx.FileDropTarget):
-    """File browser."""
-
-    def __init__(self, *args, **kwargs):
-        FBB.FileBrowseButton.__init__(self, *args, **kwargs)
-        wx.FileDropTarget.__init__(self)
-        self.SetDropTarget(self)
-        self.SetDefaultAction(
-            wx.DragCopy
-        )  # Show '+' icon when hovering over this field.
-
-    def GetPath(self, addToHistory=False):
-        current_value = self.GetValue()
-        return current_value
-
-    def SetPath(self, path):
-        self.SetValue(path)
-
-    def OnChanged(self, evt):
-        wx.PostEvent(
-            self, wx.PyCommandEvent(wx.EVT_FILEPICKER_CHANGED.typeId, self.GetId())
-        )
-
-    def OnDropFiles(self, x, y, filenames):
-        wx.PostEvent(
-            self, wx.PyCommandEvent(wx.EVT_FILEPICKER_CHANGED.typeId, self.GetId())
-        )
-
-
 def get_project_directory():
     """Return the path of the PCB directory."""
     return os.path.dirname(pcbnew.GetBoard().GetFileName())
@@ -94,55 +65,33 @@ class DRMgr(pcbnew.ActionPlugin):
         class OpenSaveDlg(wx.Frame):
             def __init__(self):
                 try:
-                    wx.Frame.__init__(self, None, title="Open/Save PCB Design Rules", pos=(150, 150))
+                    wx.Frame.__init__(
+                        self, None, title="Open/Save PCB Design Rules", pos=(200, 200)
+                    )
                     panel = wx.Panel(parent=self)
 
-                    # File browser widget for selecting the file to load/store design rules.
-                    file_wildcard = "Design Rule File (*.dru)|*.dru|All Files (*.*)|*.*"
-                    self.file_picker = DnDFilePickerCtrl(
-                        parent=panel,
-                        labelText="File:",
-                        buttonText="Browse",
-                        toolTip="Drag-and-drop file or browse for file or enter file name.",
-                        dialogTitle="Select file to open/save PCB design rules",
-                        startDirectory=get_project_directory(),
-                        initialValue="",
-                        fileMask=file_wildcard,
-                        fileMode=wx.FD_OPEN,
-                    )
-                    self.Bind(
-                        wx.EVT_FILEPICKER_CHANGED, self.file_handler, self.file_picker
-                    )
-
                     self.open_btn = wx.Button(panel, label="Open")
+                    self.open_btn.SetToolTip(
+                        wx.ToolTip('Click to load new PCB design rules from a file.'))
                     self.save_btn = wx.Button(panel, label="Save")
+                    self.save_btn.SetToolTip(
+                        wx.ToolTip('Click to store current PCB design rules into a file.'))
                     self.cancel_btn = wx.Button(panel, label="Cancel")
-                    self.open_btn.Bind(wx.EVT_BUTTON, self.do_open, self.open_btn)
-                    self.save_btn.Bind(wx.EVT_BUTTON, self.do_save, self.save_btn)
+                    self.open_btn.Bind(wx.EVT_BUTTON, self.open_dr, self.open_btn)
+                    self.save_btn.Bind(wx.EVT_BUTTON, self.save_dr, self.save_btn)
                     self.cancel_btn.Bind(wx.EVT_BUTTON, self.cancel, self.cancel_btn)
 
                     btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
                     btn_sizer.AddSpacer(WIDGET_SPACING)
-                    btn_sizer.Add(self.open_btn, flag=wx.ALL)
+                    btn_sizer.Add(self.open_btn, flag=wx.ALL | wx.ALIGN_CENTER)
                     btn_sizer.AddSpacer(WIDGET_SPACING)
-                    btn_sizer.Add(self.save_btn, flag=wx.ALL)
+                    btn_sizer.Add(self.save_btn, flag=wx.ALL | wx.ALIGN_CENTER)
                     btn_sizer.AddSpacer(WIDGET_SPACING)
-                    btn_sizer.Add(self.cancel_btn, flag=wx.ALL)
+                    btn_sizer.Add(self.cancel_btn, flag=wx.ALL | wx.ALIGN_CENTER)
                     btn_sizer.AddSpacer(WIDGET_SPACING)
-
-                    # Create a vertical sizer to hold everything in the panel.
-                    sizer = wx.BoxSizer(wx.VERTICAL)
-                    # sizer.Add(self.netlist_file_picker, 0, wx.ALL | wx.EXPAND, WIDGET_SPACING)
-                    sizer.Add(self.file_picker, 0, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, WIDGET_SPACING)
-                    sizer.Add(
-                        btn_sizer,
-                        0,
-                        wx.ALL | wx.ALIGN_CENTER,
-                        WIDGET_SPACING,
-                    )
 
                     # Size the panel.
-                    panel.SetSizer(sizer)
+                    panel.SetSizer(btn_sizer)
                     panel.Layout()
                     panel.Fit()
 
@@ -152,25 +101,41 @@ class DRMgr(pcbnew.ActionPlugin):
                 except Exception as e:
                     debug_dialog("Something went wrong!", e)
 
-            def file_handler(self, evt):
-                self.file_name = self.file_picker.GetPath()
-                #self.open_btn.SetFocus()
-
-            def do_open(self, evt):
-                with open(self.file_name, 'r') as fp:
+            def open_dr(self, evt):
+                file_dialog = wx.FileDialog(
+                    parent=self,
+                    message="Open PCB Design Rules File",
+                    defaultDir=get_project_directory(),
+                    defaultFile="",
+                    wildcard="Design rules (*.kidr)|*.kidr|All files (*.*)|*.*",
+                    style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
+                )
+                file_dialog.ShowModal()
+                file_name = file_dialog.GetPath()
+                with open(file_name, "r") as fp:
                     drs = yaml.load(fp, Loader=yaml.Loader)
                     kinjector.DesignRules().inject(drs, pcbnew.GetBoard())
-                self.Destroy()
+                file_dialog.Destroy()
 
-            def do_save(self, evt):
+            def save_dr(self, evt):
+                file_dialog = wx.FileDialog(
+                    parent=self,
+                    message="Save PCB Design Rules File",
+                    defaultDir=get_project_directory(),
+                    defaultFile="",
+                    wildcard="Design rules (*.kidr)|*.kidr|All files (*.*)|*.*",
+                    style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+                )
+                file_dialog.ShowModal()
+                file_name = file_dialog.GetPath()
                 drs = kinjector.DesignRules().eject(pcbnew.GetBoard())
                 try:
-                    del drs['settings']['netclass assignments']
+                    del drs["settings"]["netclass assignments"]
                 except KeyError:
                     pass
-                with open(self.file_name, "w") as fp:
+                with open(file_name, "w") as fp:
                     yaml.safe_dump(drs, fp, default_flow_style=False)
-                self.Destroy()
+                file_dialog.Destroy()
 
             def cancel(self, evt):
                 self.Destroy()

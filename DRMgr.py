@@ -116,6 +116,7 @@ class DRMgr(pcbnew.ActionPlugin):
                     drs = yaml.load(fp, Loader=yaml.Loader)
                     kinjector.DesignRules().inject(drs, pcbnew.GetBoard())
                 file_dialog.Destroy()
+                self.Destroy()
 
             def save_dr(self, evt):
                 file_dialog = wx.FileDialog(
@@ -129,13 +130,14 @@ class DRMgr(pcbnew.ActionPlugin):
                 file_dialog.ShowModal()
                 file_name = file_dialog.GetPath()
                 drs = kinjector.DesignRules().eject(pcbnew.GetBoard())
-                try:
-                    del drs["settings"]["netclass assignments"]
-                except KeyError:
-                    pass
+                # try:
+                    # del drs["settings"]["netclass assignments"]
+                # except KeyError:
+                    # pass
                 with open(file_name, "w") as fp:
                     yaml.safe_dump(drs, fp, default_flow_style=False)
                 file_dialog.Destroy()
+                self.Destroy()
 
             def cancel(self, evt):
                 self.Destroy()

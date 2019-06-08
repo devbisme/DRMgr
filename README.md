@@ -24,29 +24,69 @@ You will also have to install the [KinJector Python package](https://github.com/
 [instructions](https://xesscorp.github.io/kinjector/docs/_build/singlehtml/index.html).
 
 
-
 ## Usage
 
 The plugin is started by pressing the `Tools => External Plugins... => DRMgr` button.
-This adds a button to the PCBNEW window for each of the four WireIt tools:
+This brings up a small window with three buttons:
 
-![](WireIt_buttons.png)
+![](DRMgr_buttons.png)
 
-### Saving Board Settings
+* `Open`: Opens a file containing board settings and applies them to the current board.
+* `Save`: Stores the settings for the current board into a file.
+* `Cancel`: Oh, just forget it!
 
-### Applying Saved Board Settings
+
+### Applying Design Rules
+
+Pressing the `Open` button brings up the following window:
+
+![](DRMgr_open_dialog.png)
+
+Selecting a design rule file (having the default suffix of `.kidr`) and then clicking the
+`Open` button will apply the settings in the file to the board currently open
+in PCBNEW.
  
-### Example
 
-The video below demonstrates the use of the DRMgr tool:
+### Saving Design Rules
 
-[![DRMgr Demo](video_thumbnail.png)](https://youtu.be/-FPzxCktdcs)
+Pressing the `Save` button brings up the following window:
+
+![](DRMgr_save_dialog.png)
+
+Selecting a design rule file or typing a file name and then clicking the
+`Save` button will load the file with all the settings for the board currently open
+in PCBNEW.
+
+
+### Editing Design Rules
+
+The `Save` operation will create a file storing *all* the settings for the
+current board.
+If you do not want to apply some of these settings (e.g., layer visibility flags
+or net class assignments), just open the file and delete those fields.
+
+If you want more detailed control of the design rules, it's usually
+easier to open the file in PCBNEW, make changes in the
+`File => Board Setup...` dialog, and then save the altered board settings
+into the original file or a new file.
+
+
+### Caveats
+
+Due to deficiencies in the PCBNEW Python API, DRMgr is currently unable to 
+store or update design rules for the following board features:
+
+* Text and graphic dimensions for all layers,
+* Widths, gaps, and via gaps for pre-defined differential pairs.
+
 
 ## Credits
+
 
 ### Development Lead
 
 * XESS Corp. <info@xess.com>
+
 
 ### Contributors
 
@@ -55,6 +95,6 @@ None yet. Why not be the first?
 
 ## History
 
-### 0.1.0 (2019-06-05)
+### 0.1.0 (2019-06-08)
 
 * First release.

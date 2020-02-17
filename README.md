@@ -11,7 +11,7 @@ applying them to an existing or new project.
 
 * Save current PCBNEW board settings into a file.
 * Apply board settings from a file into a current PCBNEW session.
-* Portions of the board settings that are stored or retrieved is selectable.
+* Select portions of the board settings for storage or retrieval.
 
 
 ## Installation
@@ -42,7 +42,7 @@ saved or restored:
 * `Layers`: List of enabled/visible PCB layers along with number of wiring layers and PCB thickness.
 * `Design Rules`: The minimum track/via/microvia dimensions and some miscellaneous flags.
 * `Tracks & Vias`: Dimensions for pre-defined tracks and vias.
-* `Soldfer Mask/Paste`: Dimensions and clearances for solder mask and paste.
+* `Solder Mask/Paste`: Dimensions and clearances for solder mask and paste.
 * `Net Class Definitions`: Width/clearance/via/microvia/ dimensions for classes of nets.
 * `Net Class Assignments`: Assignments of nets to net classes.
 * `Plot Settings`: Parameters and options controlling the output of Gerber or other plotting files.

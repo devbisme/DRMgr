@@ -21,8 +21,8 @@ Just copy `DRMgr.py` file to one of the following directories:
 * Windows: `kicad/share/kicad/scripting/plugins`.
 * Linux: `kicad/scripting/plugins`.
 
-You will also have to install the [KinJector Python package](https://github.com/xesscorp/kinjector) using these
-[instructions](https://xesscorp.github.io/kinjector/docs/_build/singlehtml/index.html).
+You will also have to install the [KinJector Python package](https://github.com/devbisme/kinjector) using these
+[instructions](https://devbisme.github.io/kinjector/docs/_build/singlehtml/index.html).
 
 
 ## Usage
@@ -105,7 +105,7 @@ store or update design rules for the following board features:
 
 ### Development Lead
 
-* XESS Corp. <info@xess.com>
+* Dave Vandenbout <devb@xess.com>
 
 
 ### Contributors

@@ -102,18 +102,18 @@ store or update design rules for the following board features:
 
 ## Credits
 
-
 ### Development Lead
 
 * Dave Vandenbout <devb@xess.com>
 
-
-### Contributors
-
-None yet. Why not be the first?
+### [Contributors](https://github.com/devbisme/zyc/graphs/contributors)
 
 
 ## History
+
+### 1.0.0 (2021-09-17)
+
+* Decided this tool was mature to the point it could be called 1.0.0.
 
 ### 0.1.0 (2019-06-08)
 
